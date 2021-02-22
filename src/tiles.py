@@ -1,12 +1,12 @@
 class Tiles:
     class Tile:
-        def __init__(self, name, texture, color_pair=1):
+        def __init__(self, name, texture, color_pair=1, isSolid=True):
             self.name = name
             self.texture = texture
             self.color_pair = color_pair
 
     tile_list = [
-        Tile('air', ' '),       # 0
+        Tile('air', ' ', isSolid=False),       # 0
         Tile('grass','#', 2),      # 1
         Tile('dirt','~', 3),       # 2
         Tile('shale', '░'),     # 3
@@ -17,7 +17,7 @@ class Tiles:
         Tile('bedrock','Ø'),    # 8
         Tile('leaves', '░', 2),    # 9
         Tile('log', '║', 4),        # 10
-        Tile('ladder', '╫'),
+        Tile('ladder', '╫', isSolid=False),
         Tile('lava', '$', 5)
     ]
 

@@ -1,18 +1,30 @@
 # curses-minecraft
 Senior Project 2021
 
-## Current Features
+# Project Layout
 
-* Procedural generation using perlin noise
-* The ability to add as many tiles/blocks as one could want
-* A camera that renders what is within its view frustum
-* Chunk based generation and rendering
+## What's already in
 
-## Planned Features
+* Procedural generation
+* 16x256 chunks able to be generated, saved, loaded, and rendered
+* The ability to destroy tiles
+* Walking across tiles
+* Simple falling
+* Simple structures (still buggy)
 
-* Optimized chunk generation and rendering
-* Overall better generation (still using perlin noise)
-* Proper movement
-* Placing/breaking of tiles
-* Inventory
-* Liquids (?)
+## What's planned
+
+* Add block placing/picking (try to use window/pad)
+* Add more structures
+* Add cave generation
+* Add special case blocks (ladders as an example)
+* ^ will require changing collision code to make collision a "tag"
+* 
+
+## Immediate Problems/Bugs
+
+* Shorten tile placement code (prob new function)
+* Make chunk its own .py file
+* Fix structures generating across chunks
+* Reduce overuse of 'chunk_list'
+* Make all chunk functions in the actual chunk class

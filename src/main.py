@@ -22,7 +22,7 @@ class World:
         # figure out how to only generate chunks near camera
         for c in self.chunk_list:
             c.render(cam.pos, stdscr)
-w = World(0, 'foo')
+w = World(0, 'new_world')
 
 
 class Chunk:

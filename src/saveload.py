@@ -1,7 +1,7 @@
 import json
 import interpreter
 
-save_root = '../data/'
+save_root = '../save_data/'
 
 def saveChunk(c):
     c_data = interpreter.convertChunk(c)

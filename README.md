@@ -19,7 +19,6 @@ Senior Project 2021
 * Add cave generation
 * Add special case blocks (ladders as an example)
 * ^ will require changing collision code to make collision a "tag"
-* 
 
 ## Immediate Problems/Bugs
 

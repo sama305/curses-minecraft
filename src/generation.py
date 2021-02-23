@@ -34,6 +34,17 @@ structure_maps = [
             [0, 0, 10, 0, 0]
         ],
         'origin': Coord(x=2, y=3)
+    },
+    {
+        'name': 'oak_tree',
+        'map': [
+            [0, 0, 9, 0, 0],
+            [0, 9, 9, 9, 0],
+            [9, 9, 10, 9, 9],
+            [0, 0, 10, 0, 0],
+            [0, 0, 10, 0, 0]
+        ],
+        'origin': Coord(x=2, y=4)
     }
 ]
 
@@ -87,8 +98,14 @@ def generateChunk(offset):
         for l in range(3):
             placeTile(chunk, Coord(i, 254 - l), 12)
 
-        if (i == 8 and random.randint(0, 100) < 40):
-            generateStructure(chunk, 0, Coord(i, col_height - 1))
+        if (random.randint(0, 100) < 40):
+            generateStructure(chunk, random.randint(0, 1), Coord(i, col_height - 1))
+            continue
+        if (random.randint(0, 100) < 20):
+            placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
+            continue
+
+        
 
     return chunk
 

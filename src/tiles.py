@@ -23,5 +23,6 @@ class Tiles:
         Tile('begonia', '♣', 5, isSolid=False),
         Tile('rose', '♠', 4, isSolid=False),
         Tile('poppy', '☼', 6, isSolid=False),
+        Tile('wood', '=', 3)
     ]
 

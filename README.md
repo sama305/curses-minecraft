@@ -1,6 +1,19 @@
 # curses-minecraft
 Senior Project 2021
 
+# Description:
+
+This program showcases perlin noise being used to generate a procedural world with working structure generation, chunk generation/rendering, and the ability to modify the world.
+
+# How to play
+
+## Setup:
+To use this application, you must `pip install perlin-noise` and if you are using a windows device, you must `pip install windows-curses`. Please note that on windows you may need to configure your environment variables, adjust the run.bat, or even install python before (if not already installed). If all else fails simply `py main.py` in the command line.
+
+## Controls:
+
+You can move left and right using the arrow keys, and perform actions using the WASD keys. To do actions diagonally, you can use QEZX. By default, you will be in dig mode, but you can press 2 to switch to build mode.
+
 # Project Layout
 
 ## What's already in

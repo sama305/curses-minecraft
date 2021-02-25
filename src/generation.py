@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from perlin_noise import PerlinNoise
 import math
 from tiles import Tiles
@@ -17,11 +19,6 @@ start_height = 64
 #  ░░░
 # ░░║░░
 #   ║
-#
-#
-#
-#
-#
 #
 
 structure_maps = [
@@ -97,6 +94,8 @@ def generateChunk(offset):
     chunk = []
     noise = PerlinNoise(octaves=2)
     
+    chunk = [0 if n<1066 else 4 for n in range(4096)]
+
     for a in range(4096):
         if (a < 1066):
             chunk.append(0)
@@ -118,9 +117,14 @@ def generateChunk(offset):
                 current_layer += 1
             
             if (current_layer == 7):
-                current_layer = 0
-            
-            placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), current_layer)
+                current_layer = 12
+
+            if (j < 80 or noise((j + noise_offset) / x) < 0.01):
+                placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), current_layer)
+            else:
+                # Cave generation
+                if (j > 150 and j < 210):
+                    placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), 0)
         placeTile(chunk, Coord(i, 255), 8)
         for l in range(3):
             placeTile(chunk, Coord(i, 254 - l), 12)
@@ -140,8 +144,4 @@ def generateChunk(offset):
                 placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
                 continue
 
-        
-
     return chunk
-
-generateChunk(0)

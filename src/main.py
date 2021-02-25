@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import curses
 import math
 
@@ -193,8 +195,9 @@ cam = Camera()
 plr = Character()
 
 chunk_gen_distance = 3
+chunk_render_distance = 2
 
-for i in range(-abs(chunk_gen_distance - 1), abs(chunk_gen_distance - 1)):
+for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
     w.newChunk(i)
 
 def curses_main(stdscr):
@@ -217,20 +220,16 @@ def curses_main(stdscr):
         if (plr.pos.x % 15 == 0):
             new_chunk = math.floor((plr.pos.x) / 15)
 
-            if (plr.getIndexOfChunk(new_chunk+1) == -1):
-                w.newChunk(new_chunk+1)
-            if (plr.getIndexOfChunk(new_chunk) == -1):
-                w.newChunk(new_chunk)
-            if (plr.getIndexOfChunk(new_chunk - 1) == -1):
-                w.newChunk(new_chunk - 1)
-            if (plr.getIndexOfChunk(new_chunk - 2) == -1):
-                w.newChunk(new_chunk - 2)
+            if (plr.getIndexOfChunk(new_chunk+chunk_gen_distance) == -1):
+                w.newChunk(new_chunk+chunk_gen_distance)
+            if (plr.getIndexOfChunk(new_chunk - chunk_gen_distance - 1) == -1):
+                w.newChunk(new_chunk - chunk_gen_distance - 1)
 
         stdscr.clear()
         #w.render(cam, stdscr)
-        w.chunk_list[plr.current_chunk_index].render(cam.pos, stdscr)
-        w.chunk_list[plr.left_chunk_index].render(cam.pos, stdscr)
-        w.chunk_list[plr.right_chunk_index].render(cam.pos, stdscr)
+        for i in range(-abs(chunk_render_distance), abs(chunk_render_distance + 1)):
+            w.chunk_list[plr.getAdjacentChunk(plr.current_chunk, i)].render(cam.pos, stdscr)
+
         plr.render(cam.pos, stdscr)
 
         stdscr.refresh()

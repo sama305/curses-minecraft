@@ -4,7 +4,7 @@ import interpreter
 save_root = '../save_data/'
 
 def saveChunk(c):
-    c_data = interpreter.convertChunk(c)
+    c_data = interpreter.arrToData(c)
 
     return [c.chunk_pos, c_data]
 
@@ -14,7 +14,7 @@ def saveWorld(w, n):
     saved_chunks = []
     for c in w.chunk_list:
         saved_chunks.append(saveChunk(c))
-    
+
     data = {
         'seed': w.seed,
         'name': n,
@@ -26,3 +26,5 @@ def saveWorld(w, n):
 
     _file.close()
 
+def loadWorld(n):
+    file_name = save_root + n + '.json'

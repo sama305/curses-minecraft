@@ -1,4 +1,4 @@
-def convertChunk(c):
+def arrToData(c):
     current_type = c.data[0]
     count = 0
     result = []
@@ -10,5 +10,8 @@ def convertChunk(c):
             result.append(str(current_type) + '-' + str(count))
             count = 0
             current_type = c.data[i]
-    
+
     return result
+
+def dataToArr(d):
+    

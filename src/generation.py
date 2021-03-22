@@ -14,7 +14,7 @@ start_height = 64
 # ░░░░░
 #   ║
 #   ║
-#   
+#
 #   ░
 #  ░░░
 # ░░║░░
@@ -80,27 +80,21 @@ def generateStructure(chunk, structure_index, start_point, airBlocksDelete=False
     # actually make things going across chunks more natural and easy to do
     _map = structure_maps[structure_index]['map']
     origin = structure_maps[structure_index]['origin']
-    
+
     for i in range(len(_map)):
         for j in range(len(_map[0])):
             pos_rel_to_origin = Coord(origin.x - j, origin.y - i)
             pos_rel_to_start = Coord(start_point.x - pos_rel_to_origin.x, start_point.y - pos_rel_to_origin.y)
-            
+
             if (airBlocksDelete or (not airBlocksDelete and _map[i][j] != 0)):
                 placeTile(chunk, pos_rel_to_start, _map[i][j])
 
 
 def generateChunk(offset):
     chunk = []
-    noise = PerlinNoise(octaves=2)
-    
-    chunk = [0 if n<1066 else 4 for n in range(4096)]
+    noise = PerlinNoise(octaves=1)
 
-    for a in range(4096):
-        if (a < 1066):
-            chunk.append(0)
-        else:
-            chunk.append(4)
+    chunk = [0 if n<1072 else (4 if n<4080 else 8) for n in range(4096)]
 
     x = 16
     occupied = False
@@ -115,20 +109,16 @@ def generateChunk(offset):
             #normal = j - (col_height)
             if (j / (40.0 + noise_offset) % 1 == 0):
                 current_layer += 1
-            
-            if (current_layer == 7):
-                current_layer = 12
 
-            if (j < 80 or noise((j + noise_offset) / x) < 0.01):
-                placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), current_layer)
-            else:
-                # Cave generation
-                if (j > 150 and j < 210):
-                    placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), 0)
+            if (current_layer == 7):
+                current_layer = 0
+
+            placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), current_layer)
         placeTile(chunk, Coord(i, 255), 8)
         for l in range(3):
             placeTile(chunk, Coord(i, 254 - l), 12)
-        
+
+        # Structure generation
         if (not occupied):
             if (random.randint(0, 100) < 1):
                 occupied = True
@@ -145,3 +135,5 @@ def generateChunk(offset):
                 continue
 
     return chunk
+
+generateChunk(0)

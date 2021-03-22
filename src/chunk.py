@@ -8,10 +8,10 @@ class Chunk:
     def __init__(self, chunk_pos):
         self.chunk_pos = chunk_pos
         self.data = []
-        self.generate(1)
+        self.generate(chunk_pos)
 
     def generate(self, t_id):
-        self.data = g.generateChunk(0)
+        self.data = g.generateChunk(t_id)
 
     def render(self, offset, stdscr):
         # go through data and place blocks by array index

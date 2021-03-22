@@ -2,7 +2,6 @@
 
 import curses
 import math
-
 import saveload as sl
 import generation as g
 import util as u
@@ -300,10 +299,15 @@ chunk_gen_distance = 3
 chunk_render_distance = 2
 
 # Pregenerating chunk
-for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
-    w.newChunk(i)
+#for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
 
+[w.newChunk(i) for i in range(16)]
 
+w.newChunk(-1)
+
+w.newChunk(16)
+
+w.newChunk(17)
 def curses_main(stdscr):
     stdscr.clear()
     curses.noecho()

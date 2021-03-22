@@ -14,7 +14,7 @@ class Tiles:
         Tile('gneiss', '▒'),    # 4
         Tile('slate', '▓'),     # 5
         Tile('granite', '█'),   # 6
-        Tile('basalt', ' ='),    # 7
+        Tile('basalt', '='),    # 7
         Tile('bedrock','Ø'),    # 8
         Tile('leaves', '░', 2, isSolid=False),    # 9
         Tile('log', '║', 3, isSolid=False),        # 10
@@ -25,4 +25,3 @@ class Tiles:
         Tile('poppy', '☼', 6, isSolid=False),
         Tile('wood', '=', 3)
     ]
-

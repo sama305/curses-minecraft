@@ -90,12 +90,81 @@ def generateStructure(chunk, structure_index, start_point, airBlocksDelete=False
                 placeTile(chunk, pos_rel_to_start, _map[i][j])
 
 
-def generateChunk(offset):
+def generateChunk(chunk_pos):
+    # region = 16 chunks or 64 tiles
+    # chunk = 16 tiles
+
     chunk = []
-    noise = PerlinNoise(octaves=1)
+    chunk = [0 for n in range(4096)]
 
-    chunk = [0 if n<1072 else (4 if n<4080 else 8) for n in range(4096)]
+    region = 0
+    regionPos = 0
+    if (chunk_pos >= 0):
+        region = math.floor(chunk_pos / 16)
+        regionPos = chunk_pos % 16
+    else:
+        region = math.ceil((chunk_pos - 16) / 16)
+        regionPos = chunk_pos % 16
+        print(region)
+        print(regionPos)
 
+    noise1 = PerlinNoise(octaves=1, seed=region + 10)
+    noise2 = PerlinNoise(octaves=2, seed=region + 10)
+    noise3 = PerlinNoise(octaves=4, seed=region + 10)
+
+    start_pos = regionPos * 16
+
+    height_map = []
+    for x in range(16):
+        noise_val =         noise1([(x + start_pos)/64]) * 90
+        noise_val += 0.75  * noise2([(x + start_pos)/64]) * 30
+        noise_val += 0.5 * noise3([(x + start_pos)/64]) * 40
+
+        height_map.append(math.floor(noise_val) + start_height)
+        #height_map = [math.floor(noise([(x + start_pos)/64, 0.5, 1]) * 30) + start_height for x in range(16)]
+
+    for x in range(len(height_map)):
+        placeTile(chunk, Coord(x, height_map[x]), 1)
+        for y in range(height_map[x] + 1, 255):
+
+            if (y > 150 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 7)
+            elif (y > 110 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 6)
+                cave_val = noise3([(x + start_pos)/64, y/(256 - height_map[x])])
+                if (abs(cave_val) < 0.001 * y):
+                    placeTile(chunk, Coord(x, y), 0)
+            elif (y > 90 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 5)
+            elif (y > 30 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 4)
+                cave_val = noise3([(x + start_pos)/64 / 2, y/(256 - height_map[x]) * 4])
+                if (abs(cave_val) < 0.001 * (y % (256 - height_map[x]))):
+                    placeTile(chunk, Coord(x, y), 0)
+            elif (y > 5 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 3)
+            else:
+                placeTile(chunk, Coord(x, y), 2)
+
+            # Structure generation
+            """
+            if (not occupied):
+                if (random.randint(0, 100) < 1):
+                    occupied = True
+                    generateStructure(chunk, 2, Coord(8, col_height - 1), True)
+                    continue
+                if ((i > 1 and i < 7) and random.randint(0, 100) < 30):
+                    generateStructure(chunk, random.randint(0, 1), Coord(i, col_height - 1))
+                    continue
+                if ((i > 2 and i < 6) and random.randint(0, 100) < 5):
+                    generateStructure(chunk, 3, Coord(i, col_height - 1))
+                    continue
+                if ((i > 1 and i < 7) and random.randint(0, 100) < 20):
+                    placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
+                    continue
+                    """
+
+    """
     x = 16
     occupied = False
     for i in range(x):
@@ -133,7 +202,8 @@ def generateChunk(offset):
             if ((i > 1 and i < 7) and random.randint(0, 100) < 20):
                 placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
                 continue
+        """
 
     return chunk
 
-generateChunk(0)
+generateChunk(-1)

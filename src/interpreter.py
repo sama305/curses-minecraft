@@ -13,5 +13,5 @@ def arrToData(c):
 
     return result
 
-def dataToArr(d):
-    
+#def dataToArr(d):
+#

@@ -1,10 +1,11 @@
 class Tiles:
     class Tile:
-        def __init__(self, name, texture, color_pair=1, isSolid=True):
+        def __init__(self, name, texture, color_pair=1, isSolid=True, isClimbable=False):
             self.name = name
             self.texture = texture
             self.color_pair = color_pair
             self.isSolid = isSolid
+            self.isClimbable = isClimbable
 
     tile_list = [
         Tile('air', ' ', isSolid=False),       # 0
@@ -16,15 +17,15 @@ class Tiles:
         Tile('granite', '█'),   # 6
         Tile('basalt', '='),    # 7
         Tile('bedrock','Ø'),    # 8
-        Tile('leaves', '░', 2, isSolid=False),    # 9
-        Tile('log', '║', 3, isSolid=False),        # 10
-        Tile('ladder', '╫', isSolid=False), #11
-        Tile('lava', '$', 4, isSolid=False), # 12
+        Tile('leaves', '░', 2, isSolid=False, isClimbable=True),    # 9
+        Tile('log', '║', 3, isSolid=False, isClimbable=True),        # 10
+        Tile('ladder', '╫', 3, isSolid=False, isClimbable=True), #11
+        Tile('lava', '░', 4, isSolid=False, isClimbable=True), # 12
         Tile('begonia', '♣', 5, isSolid=False), # 13
         Tile('rose', '♠', 4, isSolid=False), # 14
         Tile('poppy', '☼', 6, isSolid=False), # 15
         Tile('wood', '=', 3), # 16
-        Tile('redwood', 'H', 3, isSolid=False), # 17
+        Tile('redwood', 'H', 3, isSolid=False, isClimbable=True), # 17
         Tile('gold', '§', 3), # 18
         Tile('diamond', '♦', 6), # 19
         Tile('loam', '~', 7), # 20
@@ -32,11 +33,11 @@ class Tiles:
         Tile('snowy grass', '#'), # 22
         Tile('snowy leaves', '░', isSolid=False), # 23
         Tile('snowy layer', '_', isSolid=False), # 24
-        Tile('door', '|', 3, isSolid=False), # 25
+        Tile('door', '|', 3, isSolid=False, isClimbable=True), # 25
         Tile('solid log', '║', 3), # 26
         Tile('table', '╥', 3, isSolid=False), # 27
-        Tile('friend 1', '☻', 6, isSolid=False), # 28
-        Tile('friend 2', '☺', 4, isSolid=False), # 29
+        Tile('friend 1', '☻', 6, isSolid=False, isClimbable=True), # 28
+        Tile('friend 2', '☺', 4, isSolid=False, isClimbable=True), # 29
         Tile('red concrete', '█', 4), # 30
         Tile('cyan concrete', '█', 6), # 31
         Tile('green concrete', '█', 2), # 32
@@ -47,5 +48,17 @@ class Tiles:
         Tile('heckstone', '#', 9), # 37
         Tile('heckslate', '░', 9), # 38
         Tile('firelily', '♀', 4, isSolid=False), # 39
-        Tile('water', '$', 8, isSolid=False)
+        Tile('water', '░', 8, isSolid=False, isClimbable=True), # 40
+        Tile('kelp', '⌠', 2, isSolid=False, isClimbable=True), # 41
+        Tile('seaweed left', ')', 2, isSolid=False, isClimbable=True), # 42
+        Tile('seaweed right', '(', 2, isSolid=False, isClimbable=True), # 43
+        Tile('boat left', '\\', 3, isSolid=False, isClimbable=True), # 44
+        Tile('boat right', '/', 3, isSolid=False, isClimbable=True), # 45
+        Tile('wood floor', '_', 3, isSolid=False, isClimbable=True), # 46
+        Tile('flag', '>', 4, isSolid=False), # 47
+        Tile('cod', '◄', 1, isSolid=False, isClimbable=True), # 48
+        Tile('salmon 2', '»', 6, isSolid=False, isClimbable=True), # 49
+        Tile('bass 3', '≤', 4, isSolid=False, isClimbable=True), # 50
+
+
     ]

@@ -9,16 +9,19 @@ import random as r
 from tiles import Tiles as t
 from coord import Coord as p
 from chunk import Chunk
+import os
+import json
 
 directions = {
     "w": 0,
     "e": 1,
     "d": 2,
     "c": 3,
-    "s": 4,
+    "x": 4,
     "z": 5,
     "a": 6,
-    "q": 7
+    "q": 7,
+    "s": 8
 }
 
 """
@@ -66,7 +69,7 @@ class World:
 
 # Create World
 # TODO: load data from save file
-w = World(r.randint(0,400), 'new_world')
+w = World(0, 'new_world')
 
 
 """
@@ -170,6 +173,9 @@ class Character:
     def collisionCheck(self, chunk_index, pos):
         return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isSolid
 
+    def climbableCheck(self, chunk_index, pos):
+        return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isClimbable
+
     def getIndexOfChunk(self, _id):
         for i in range(len(w.chunk_list)):
             if (self.chunk_list[i].chunk_pos == _id):
@@ -193,7 +199,8 @@ class Character:
         # TODO
         #
 
-        if (self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y + 1))):
+        if (self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y + 1))
+         or self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))):
             if (_dir == 0):
                 # On left edge of chunk
                 if (self.current_chunk_pos.x == 0):
@@ -220,6 +227,14 @@ class Character:
                         self.pos.addX(1)
                     elif (not self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x+1, y=self.pos.y-1))):
                         self.pos.addX(1); self.pos.addY(-1)
+            elif (_dir == 2):
+                if (self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))
+                and self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y - 1))):
+                    self.pos.addY(-1)
+            elif (_dir == 3):
+                if (self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))
+                and self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y + 1))):
+                    self.pos.addY(1)
         # If tile below player is air, just make player fall
         else:
             self.pos.y += 1
@@ -288,6 +303,12 @@ class Character:
                 g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
                     x=self.current_chunk_pos.x - 1, y=self.current_chunk_pos.y - 1), self.equipped_tile)
 
+        elif (_dir == 8):
+            if (not t.tile_list[self.equipped_tile].isSolid):
+                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
+                    x=self.current_chunk_pos.x, y=self.current_chunk_pos.y), self.equipped_tile)
+
+
 
 # +------------------------------------------------------+
 # |                      MAIN LOOP!                      |
@@ -302,7 +323,13 @@ chunk_render_distance = 2
 # Pregenerating chunk
 #for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
 
-[w.newChunk(i) for i in range(-4, 4)]
+
+menu_options = ["Start new game"]
+def initialize_menu():
+	file_list = os.listdir("../save_data/")
+	for f in file_list:
+		menu_options.append(f)
+
 
 def curses_main(stdscr):
     stdscr.clear()
@@ -322,7 +349,77 @@ def curses_main(stdscr):
     curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_YELLOW)
     curses.init_pair(8, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(9, curses.COLOR_YELLOW, curses.COLOR_RED)
+    curses.init_pair(10, curses.COLOR_GREEN, curses.COLOR_BLUE)
+    curses.init_pair(11, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
+    author = "Samuel Anderson"
+    game_title = "Curses-craft (working title)"
+    selected = 0
+
+    initialize_menu()
+
+    # +------------------------------------------------------+
+    # |                      MENU LOOP!                      |
+    # +------------------------------------------------------+
+    while (True):
+        stdscr.refresh()
+        stdscr.addstr(1, math.floor(cols / 2) - math.floor(len(game_title) / 2), game_title)
+        stdscr.addstr(rows - 2, math.floor(cols / 2) - math.floor(len("By " + author) / 2), "By " + author)
+
+        for i in range(len(menu_options)):
+            current_option = menu_options[i]
+            if i != 0:
+                current_option = "Load: " + current_option
+
+            if i == selected:
+                stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2), math.floor(cols / 2) - math.floor(len(current_option) / 2), current_option, curses.color_pair(11))
+            else:
+                stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2), math.floor(cols / 2) - math.floor(len(current_option) / 2), current_option)
+
+
+        k = stdscr.getch()
+        if k == ord("q"):
+            crash = True
+        elif k == curses.KEY_UP:
+            selected = selected - 1
+            if selected < 0:
+                selected = len(menu_options) - 1
+        elif k == curses.KEY_DOWN:
+            selected = selected + 1
+            if selected > len(menu_options) - 1:
+                selected = 0
+        # Select
+        elif k == 10:
+
+            if selected != 0:
+                stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Loading...") / 2), "Loading...")
+                stdscr.refresh()
+
+                with open("../save_data/" + menu_options[selected]) as f:
+                    data = json.load(f)
+
+                w.name = data['name']
+                w.seed = data['seed']
+                plr.pos.x = data['player_pos'][0]
+                plr.pos.y = data['player_pos'][1]
+                plr.equipped_tile = data['player_equipped_tile']
+
+                w.chunk_list = sl.loadWorld(data)
+            # New Game
+            else:
+                stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Creating world...") / 2), "Creating world...")
+                stdscr.refresh()
+
+                w.name = "world_" + str(len(os.listdir("../save_data/")) + 1)
+                w.seed = r.randint(0, 999)
+                [w.newChunk(i) for i in range(-4, 4)]
+            break
+
+
+# +------------------------------------------------------+
+# |                      MAIN LOOP!                      |
+# +------------------------------------------------------+
+    show_hud = True
     while (True):
         plr.update(w.chunk_list)
 
@@ -347,24 +444,35 @@ def curses_main(stdscr):
 
         stdscr.refresh()
 
-        stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
-        stdscr.addstr(1, 0, 'Y:' + str(plr.pos.y))
-        stdscr.addstr(2, 0, 'CHUNK:' + str(plr.current_chunk) +
-                      " - " + str(plr.current_chunk_pos.x + 1) + "/16")
-        stdscr.addstr(3, 0, 'SELECTED TILE: [' + str(plr.equipped_tile) + ']')
-        stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
-                             curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
-        stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
+        if (show_hud):
+            stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
+            stdscr.addstr(1, 0, 'Y:' + str(plr.pos.y))
+            stdscr.addstr(2, 0, 'CHUNK:' + str(plr.current_chunk) +
+                          " - " + str(plr.current_chunk_pos.x + 1) + "/16")
+            stdscr.addstr(3, 0, 'SELECTED TILE: [' + str(plr.equipped_tile) + ']')
+            stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
+                                 curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
+            stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
 
         k = stdscr.getch()
 
         if (k == ord('Q')):
             break
 
+        if (k == ord('S')):
+            sl.saveWorld(w, plr)
+            stdscr.addstr(0, math.floor(cols / 2), "Saving...")
+            stdscr.refresh()
+
+
         if (k == curses.KEY_LEFT):
             plr.movePlr(0)
         if (k == curses.KEY_RIGHT):
             plr.movePlr(1)
+        if (k == curses.KEY_UP):
+            plr.movePlr(2)
+        if (k == curses.KEY_DOWN):
+            plr.movePlr(3)
 
         if (k == ord('1')):
             plr.equipped_tile -= 1
@@ -376,6 +484,10 @@ def curses_main(stdscr):
                 plr.equipped_tile = 0
         if (k == ord('3')):
             plr.equipped_tile = 0
+
+        if (k == ord('h')):
+            show_hud = not show_hud
+            stdscr.refresh()
 
         # Iterates over all possible directions to check for placing
         # NOTE: Heavily reduces boilerplate
@@ -390,6 +502,4 @@ def curses_main(stdscr):
 
 curses.wrapper(curses_main)
 
-print(len(w.chunk_list))
-
-sl.saveWorld(w, w.name)
+sl.saveWorld(w, plr)

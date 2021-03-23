@@ -23,6 +23,10 @@ water_height = 64
 # ░░║░░
 #   ║
 #
+#   |>
+# \_|_/
+#
+
 
 structure_maps = [
     {
@@ -117,6 +121,14 @@ structure_maps = [
             [21]
         ],
         'origin': Coord(x=0,y=1)
+    },
+    {
+        'name': 'small_boat',
+        'map': [
+            [0, 0, 25, 47, 0],
+            [44, 46, 25, 46, 45]
+        ],
+        'origin': Coord(x=1,y=1)
     }
 ]
 
@@ -157,8 +169,6 @@ def generateChunk(chunk_pos, seed):
     else:
         region = math.ceil((chunk_pos - 16) / 16)
         regionPos = chunk_pos % 16
-        print(region)
-        print(regionPos)
 
     noise1 = PerlinNoise(octaves=1, seed=region + seed + 10)
     noise2 = PerlinNoise(octaves=4, seed=region + seed + 10)
@@ -177,18 +187,34 @@ def generateChunk(chunk_pos, seed):
 
     occupied = False
     for x in range(len(height_map)):
+        # Grass
         placeTile(chunk, Coord(x, height_map[x]), 1)
+
+        # Snow level
         if (height_map[x] < snow_height):
             placeTile(chunk, Coord(x, height_map[x]), 22)
             placeTile(chunk, Coord(x, height_map[x] - 1), 24)
 
+        # Water levels
         if (height_map[x] > water_height):
             placeTile(chunk, Coord(x, height_map[x]), 2)
             for y in range(water_height, height_map[x]):
                 placeTile(chunk, Coord(x, y), 40)
+                if (random.randint(1,20) == 1):
+                    placeTile(chunk, Coord(x, y), random.randint(48,50))
+            # Seaweed/kelp
+            if (random.randint(1,3) == 1):
+                height = water_height + random.randint(1, height_map[x] - water_height + 1)
+                for i in range(height, height_map[x]):
+                    if (i % 2 == 0):
+                        placeTile(chunk, Coord(x, i), 42)
+                    else:
+                        placeTile(chunk, Coord(x, i), 43)
+            if (x > 3 and x < 13 and random.randint(1,10) == 1):
+                generateStructure(chunk, 8, Coord(8, water_height - 1), False)
 
         for y in range(height_map[x] + 1, 255):
-            if (y > 235):
+            if (y > 240):
                 placeTile(chunk, Coord(x, y), 12)
             # Bedrock layer
             if (y > 252):

@@ -5,13 +5,14 @@ import math
 import curses
 
 class Chunk:
-    def __init__(self, chunk_pos):
+    def __init__(self, chunk_pos, seed):
         self.chunk_pos = chunk_pos
         self.data = []
+        self.seed = seed
         self.generate(chunk_pos)
 
     def generate(self, t_id):
-        self.data = g.generateChunk(t_id)
+        self.data = g.generateChunk(t_id, self.seed)
 
     def render(self, offset, stdscr):
         # go through data and place blocks by array index

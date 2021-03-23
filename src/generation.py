@@ -5,8 +5,11 @@ import math
 from tiles import Tiles
 import random
 from coord import Coord
+import util as u
 
 start_height = 64
+snow_height = 50
+water_height = 64
 
 # Structures:
 #
@@ -33,7 +36,7 @@ structure_maps = [
         'origin': Coord(x=2, y=3)
     },
     {
-        'name': 'oak_tree',
+        'name': 'pine_tree',
         'map': [
             [0, 0, 9, 0, 0],
             [0, 9, 9, 9, 0],
@@ -65,6 +68,55 @@ structure_maps = [
             [4, 4, 4],
         ],
         'origin': Coord(1, 1)
+    },
+    {
+        'name': 'giant_pine_tree',
+        'map': [
+            [0, 0, 0, 9, 0, 0, 0],
+            [0, 0, 9, 9, 9, 0, 0],
+            [0, 0, 9, 9, 9, 0, 0],
+            [0, 9, 9, 9, 9, 9, 0],
+            [0, 9, 9, 9, 9, 9, 0],
+            [9, 9, 9, 9, 9, 9, 9],
+            [9, 9, 9, 9, 9, 9, 9],
+            [0, 9, 17, 17, 17, 9, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+            [0, 0, 17, 17, 17, 0, 0],
+        ],
+        'origin': Coord(x=2, y=18)
+    },
+    {
+        'name': 'begonia_flower',
+        'map': [
+            [13],
+            [21]
+        ],
+        'origin': Coord(x=0,y=1)
+    },
+    {
+        'name': 'rose_flower',
+        'map': [
+            [14],
+            [21]
+        ],
+        'origin': Coord(x=0,y=1)
+    },
+    {
+        'name': 'poppy_flower',
+        'map': [
+            [15],
+            [21]
+        ],
+        'origin': Coord(x=0,y=1)
     }
 ]
 
@@ -86,11 +138,11 @@ def generateStructure(chunk, structure_index, start_point, airBlocksDelete=False
             pos_rel_to_origin = Coord(origin.x - j, origin.y - i)
             pos_rel_to_start = Coord(start_point.x - pos_rel_to_origin.x, start_point.y - pos_rel_to_origin.y)
 
-            if (airBlocksDelete or (not airBlocksDelete and _map[i][j] != 0)):
+            if (airBlocksDelete or chunk[u.coordToIndex(pos_rel_to_start)] == 24 or (not airBlocksDelete and _map[i][j] != 0)):
                 placeTile(chunk, pos_rel_to_start, _map[i][j])
 
 
-def generateChunk(chunk_pos):
+def generateChunk(chunk_pos, seed):
     # region = 16 chunks or 64 tiles
     # chunk = 16 tiles
 
@@ -108,102 +160,94 @@ def generateChunk(chunk_pos):
         print(region)
         print(regionPos)
 
-    noise1 = PerlinNoise(octaves=1, seed=region + 10)
-    noise2 = PerlinNoise(octaves=2, seed=region + 10)
-    noise3 = PerlinNoise(octaves=4, seed=region + 10)
+    noise1 = PerlinNoise(octaves=1, seed=region + seed + 10)
+    noise2 = PerlinNoise(octaves=4, seed=region + seed + 10)
+    noise3 = PerlinNoise(octaves=8, seed=region + seed + 10)
 
     start_pos = regionPos * 16
 
     height_map = []
     for x in range(16):
-        noise_val =         noise1([(x + start_pos)/64]) * 90
-        noise_val += 0.75  * noise2([(x + start_pos)/64]) * 30
-        noise_val += 0.5 * noise3([(x + start_pos)/64]) * 40
+        noise_val =         noise1([(x + start_pos)/64]) * 50
+        noise_val += 0.75 * noise2([(x + start_pos)/64]) * 30
+        noise_val += 0.5  * noise3([(x + start_pos)/64]) * 5
 
         height_map.append(math.floor(noise_val) + start_height)
         #height_map = [math.floor(noise([(x + start_pos)/64, 0.5, 1]) * 30) + start_height for x in range(16)]
 
+    occupied = False
     for x in range(len(height_map)):
         placeTile(chunk, Coord(x, height_map[x]), 1)
-        for y in range(height_map[x] + 1, 255):
+        if (height_map[x] < snow_height):
+            placeTile(chunk, Coord(x, height_map[x]), 22)
+            placeTile(chunk, Coord(x, height_map[x] - 1), 24)
 
-            if (y > 150 + height_map[x]):
+        if (height_map[x] > water_height):
+            placeTile(chunk, Coord(x, height_map[x]), 2)
+            for y in range(water_height, height_map[x]):
+                placeTile(chunk, Coord(x, y), 40)
+
+        for y in range(height_map[x] + 1, 255):
+            if (y > 235):
+                placeTile(chunk, Coord(x, y), 12)
+            # Bedrock layer
+            if (y > 252):
+                placeTile(chunk, Coord(x, y), 8)
+            # Heckstone layer
+            elif (y > 182 + height_map[x]):
+                placeTile(chunk, Coord(x, y), 37)
+            # Hecklactite/Heckslate layer
+            elif (y > 160 + height_map[x]):
+                cave_val = noise3([(x + start_pos)/64 / 2, y/(256 - height_map[x])])
+                if (abs(cave_val) > 0.001 * y):
+                    placeTile(chunk, Coord(x, y), 38)
+            # Basalt layer
+            elif (y > 140 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 7)
+                if (random.randint(0,100) < 1):
+                    placeTile(chunk, Coord(x, y), 19)
+            # Stalactite/Granite layer
             elif (y > 110 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 6)
                 cave_val = noise3([(x + start_pos)/64, y/(256 - height_map[x])])
                 if (abs(cave_val) < 0.001 * y):
                     placeTile(chunk, Coord(x, y), 0)
+            # Slate layer
             elif (y > 90 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 5)
+                if (random.randint(0,100) < 3):
+                    placeTile(chunk, Coord(x, y), 18)
+            # Cave/Gneiss layer
             elif (y > 30 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 4)
                 cave_val = noise3([(x + start_pos)/64 / 2, y/(256 - height_map[x]) * 4])
                 if (abs(cave_val) < 0.001 * (y % (256 - height_map[x]))):
                     placeTile(chunk, Coord(x, y), 0)
+            # Shale layer
             elif (y > 5 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 3)
+                if (random.randint(0,100) < 35):
+                    placeTile(chunk, Coord(x, y), 4)
+            # Dirt
             else:
                 placeTile(chunk, Coord(x, y), 2)
-
-            # Structure generation
-            """
-            if (not occupied):
-                if (random.randint(0, 100) < 1):
-                    occupied = True
-                    generateStructure(chunk, 2, Coord(8, col_height - 1), True)
-                    continue
-                if ((i > 1 and i < 7) and random.randint(0, 100) < 30):
-                    generateStructure(chunk, random.randint(0, 1), Coord(i, col_height - 1))
-                    continue
-                if ((i > 2 and i < 6) and random.randint(0, 100) < 5):
-                    generateStructure(chunk, 3, Coord(i, col_height - 1))
-                    continue
-                if ((i > 1 and i < 7) and random.randint(0, 100) < 20):
-                    placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
-                    continue
-                    """
-
-    """
-    x = 16
-    occupied = False
-    for i in range(x):
-        noise_offset = math.floor(noise(i / x) * 10)
-        col_height = noise_offset + start_height
-
-        placeTile(chunk, Coord(i + (math.floor(noise(col_height / x) * 10)), col_height), 1)
-
-        current_layer = 2
-        for j in range(col_height + 1, 255):
-            #normal = j - (col_height)
-            if (j / (40.0 + noise_offset) % 1 == 0):
-                current_layer += 1
-
-            if (current_layer == 7):
-                current_layer = 0
-
-            placeTile(chunk, Coord(i + math.floor(noise(j / x) * 10), j), current_layer)
-        placeTile(chunk, Coord(i, 255), 8)
-        for l in range(3):
-            placeTile(chunk, Coord(i, 254 - l), 12)
+                if (random.randint(0,100) < 20):
+                    placeTile(chunk, Coord(x, y), 20)
 
         # Structure generation
-        if (not occupied):
-            if (random.randint(0, 100) < 1):
+        if (not occupied and height_map[x] > snow_height and height_map[x] < water_height):
+            if (random.randint(0, 100) < 5):
                 occupied = True
-                generateStructure(chunk, 2, Coord(8, col_height - 1), True)
+                generateStructure(chunk, 4, Coord(8, height_map[8]), False)
                 continue
-            if ((i > 1 and i < 7) and random.randint(0, 100) < 30):
-                generateStructure(chunk, random.randint(0, 1), Coord(i, col_height - 1))
+            if ((x > 1 and x < 7) and random.randint(0, 100) < 30):
+                generateStructure(chunk, random.randint(0, 1), Coord(x, height_map[x] - 1))
                 continue
-            if ((i > 2 and i < 6) and random.randint(0, 100) < 5):
-                generateStructure(chunk, 3, Coord(i, col_height - 1))
+            if ((x > 2 and x < 6) and random.randint(0, 100) < 5):
+                generateStructure(chunk, 3, Coord(x, height_map[x] - 1))
                 continue
-            if ((i > 1 and i < 7) and random.randint(0, 100) < 20):
-                placeTile(chunk, Coord(i, col_height - 1), random.randint(13,15))
+            if ((x > 1 and x < 7) and random.randint(0, 100) < 75):
+                generateStructure(chunk, random.randint(5, 7), Coord(x, height_map[x] - 1))
                 continue
-        """
 
     return chunk
-
-generateChunk(-1)

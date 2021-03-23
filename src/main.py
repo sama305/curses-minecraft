@@ -5,6 +5,7 @@ import math
 import saveload as sl
 import generation as g
 import util as u
+import random as r
 from tiles import Tiles as t
 from coord import Coord as p
 from chunk import Chunk
@@ -46,7 +47,7 @@ class World:
     - Appends a new Chunk object to chunk_list with specified position
     """
     def newChunk(self, new_pos):
-        self.chunk_list.append(Chunk(new_pos))
+        self.chunk_list.append(Chunk(new_pos, self.seed))
 
 
     """
@@ -65,7 +66,7 @@ class World:
 
 # Create World
 # TODO: load data from save file
-w = World(0, 'new_world')
+w = World(r.randint(0,400), 'new_world')
 
 
 """
@@ -301,16 +302,13 @@ chunk_render_distance = 2
 # Pregenerating chunk
 #for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
 
-[w.newChunk(i) for i in range(16)]
+[w.newChunk(i) for i in range(-4, 4)]
 
-w.newChunk(-1)
-
-w.newChunk(16)
-
-w.newChunk(17)
 def curses_main(stdscr):
     stdscr.clear()
+    curses.halfdelay(5)
     curses.noecho()
+    curses.curs_set(0)
     rows, cols = stdscr.getmaxyx()
 
     # Intializing all the colors for curses
@@ -322,12 +320,13 @@ def curses_main(stdscr):
     curses.init_pair(5, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
     curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+    curses.init_pair(8, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(9, curses.COLOR_YELLOW, curses.COLOR_RED)
 
     while (True):
         plr.update(w.chunk_list)
 
         # Generating chunk
-        '''
         if (plr.pos.x % 15 == 0):
             new_chunk = math.floor((plr.pos.x) / 15)
 
@@ -335,7 +334,6 @@ def curses_main(stdscr):
                 w.newChunk(new_chunk+chunk_gen_distance)
             if (plr.getIndexOfChunk(new_chunk - chunk_gen_distance - 1) == -1):
                 w.newChunk(new_chunk - chunk_gen_distance - 1)
-        '''
 
         stdscr.clear()
         #w.render(cam, stdscr)
@@ -352,9 +350,14 @@ def curses_main(stdscr):
         stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
         stdscr.addstr(1, 0, 'Y:' + str(plr.pos.y))
         stdscr.addstr(2, 0, 'CHUNK:' + str(plr.current_chunk) +
-                      " - " + str(plr.current_chunk_pos.x) + "/15")
+                      " - " + str(plr.current_chunk_pos.x + 1) + "/16")
+        stdscr.addstr(3, 0, 'SELECTED TILE: [' + str(plr.equipped_tile) + ']')
+        stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
+                             curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
+        stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
 
         k = stdscr.getch()
+
         if (k == ord('Q')):
             break
 
@@ -364,9 +367,15 @@ def curses_main(stdscr):
             plr.movePlr(1)
 
         if (k == ord('1')):
-            plr.equipped_tile = 0
+            plr.equipped_tile -= 1
+            if (plr.equipped_tile < 0):
+                plr.equipped_tile = len(t.tile_list) - 1
         if (k == ord('2')):
-            plr.equipped_tile = 5
+            plr.equipped_tile += 1
+            if (plr.equipped_tile > len(t.tile_list) - 1):
+                plr.equipped_tile = 0
+        if (k == ord('3')):
+            plr.equipped_tile = 0
 
         # Iterates over all possible directions to check for placing
         # NOTE: Heavily reduces boilerplate

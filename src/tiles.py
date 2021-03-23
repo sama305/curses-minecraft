@@ -18,10 +18,34 @@ class Tiles:
         Tile('bedrock','Ø'),    # 8
         Tile('leaves', '░', 2, isSolid=False),    # 9
         Tile('log', '║', 3, isSolid=False),        # 10
-        Tile('ladder', '╫', isSolid=False),
-        Tile('lava', '$', 4),
-        Tile('begonia', '♣', 5, isSolid=False),
-        Tile('rose', '♠', 4, isSolid=False),
-        Tile('poppy', '☼', 6, isSolid=False),
-        Tile('wood', '=', 3)
+        Tile('ladder', '╫', isSolid=False), #11
+        Tile('lava', '$', 4, isSolid=False), # 12
+        Tile('begonia', '♣', 5, isSolid=False), # 13
+        Tile('rose', '♠', 4, isSolid=False), # 14
+        Tile('poppy', '☼', 6, isSolid=False), # 15
+        Tile('wood', '=', 3), # 16
+        Tile('redwood', 'H', 3, isSolid=False), # 17
+        Tile('gold', '§', 3), # 18
+        Tile('diamond', '♦', 6), # 19
+        Tile('loam', '~', 7), # 20
+        Tile('plant stem', '|', 2, isSolid=False), # 21
+        Tile('snowy grass', '#'), # 22
+        Tile('snowy leaves', '░', isSolid=False), # 23
+        Tile('snowy layer', '_', isSolid=False), # 24
+        Tile('door', '|', 3, isSolid=False), # 25
+        Tile('solid log', '║', 3), # 26
+        Tile('table', '╥', 3, isSolid=False), # 27
+        Tile('friend 1', '☻', 6, isSolid=False), # 28
+        Tile('friend 2', '☺', 4, isSolid=False), # 29
+        Tile('red concrete', '█', 4), # 30
+        Tile('cyan concrete', '█', 6), # 31
+        Tile('green concrete', '█', 2), # 32
+        Tile('white concrete', '█', 1), # 33
+        Tile('magenta concrete', '█', 5), # 34
+        Tile('yellow concrete', '█', 3), # 35
+        Tile('blue concrete', '█', 8), # 36
+        Tile('heckstone', '#', 9), # 37
+        Tile('heckslate', '░', 9), # 38
+        Tile('firelily', '♀', 4, isSolid=False), # 39
+        Tile('water', '$', 8, isSolid=False)
     ]

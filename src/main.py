@@ -12,6 +12,7 @@ from chunk import Chunk
 import os
 import json
 
+
 directions = {
     "w": 0,
     "e": 1,

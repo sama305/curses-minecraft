@@ -57,8 +57,10 @@ class Tiles:
         Tile('wood floor', '_', 3, isSolid=False, isClimbable=True), # 46
         Tile('flag', '>', 4, isSolid=False), # 47
         Tile('cod', '◄', 1, isSolid=False, isClimbable=True), # 48
-        Tile('salmon 2', '»', 6, isSolid=False, isClimbable=True), # 49
-        Tile('bass 3', '≤', 4, isSolid=False, isClimbable=True), # 50
+        Tile('salmon', '»', 6, isSolid=False, isClimbable=True), # 49
+        Tile('bass', '≤', 4, isSolid=False, isClimbable=True), # 50
+        Tile('snowman head', '☻', 1, isSolid=False), # 51
+        Tile('snowman torso', 'O', 1, isSolid=False), # 
 
 
     ]

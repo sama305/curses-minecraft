@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from perlin_noise import PerlinNoise
 import math
 from tiles import Tiles
 import random
 from coord import Coord
 import util as u
+
+import sys
+sys.path.insert(1, '../lib/perlin-noise-1.7/perlin_noise/')
+from perlin_noise import PerlinNoise
 
 start_height = 64
 snow_height = 50
@@ -178,9 +181,9 @@ def generateChunk(chunk_pos, seed):
 
     height_map = []
     for x in range(16):
-        noise_val =         noise1([(x + start_pos)/64]) * 50
-        noise_val += 0.75 * noise2([(x + start_pos)/64]) * 30
-        noise_val += 0.5  * noise3([(x + start_pos)/64]) * 5
+        noise_val =         noise1([(x + start_pos)/256]) * 75
+        noise_val += 0.75 * noise2([(x + start_pos)/256]) * 65
+        noise_val += 0.5  * noise3([(x + start_pos)/256]) * 50
 
         height_map.append(math.floor(noise_val) + start_height)
         #height_map = [math.floor(noise([(x + start_pos)/64, 0.5, 1]) * 30) + start_height for x in range(16)]
@@ -193,7 +196,12 @@ def generateChunk(chunk_pos, seed):
         # Snow level
         if (height_map[x] < snow_height):
             placeTile(chunk, Coord(x, height_map[x]), 22)
-            placeTile(chunk, Coord(x, height_map[x] - 1), 24)
+            if (random.randint(1, 100) == 1):
+                placeTile(chunk, Coord(x, height_map[x] - 3), 51)
+                placeTile(chunk, Coord(x, height_map[x] - 2), 52)
+                placeTile(chunk, Coord(x, height_map[x] - 1), 52)
+            else:
+                placeTile(chunk, Coord(x, height_map[x] - 1), 24)
 
         # Water levels
         if (height_map[x] > water_height):
@@ -210,7 +218,7 @@ def generateChunk(chunk_pos, seed):
                         placeTile(chunk, Coord(x, i), 42)
                     else:
                         placeTile(chunk, Coord(x, i), 43)
-            if (x > 3 and x < 13 and random.randint(1,10) == 1):
+            if (x > 3 and x < 13 and random.randint(1,70) == 1):
                 generateStructure(chunk, 8, Coord(8, water_height - 1), False)
 
         for y in range(height_map[x] + 1, 255):

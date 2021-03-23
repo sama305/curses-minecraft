@@ -37,7 +37,7 @@ Finally, to quit the game, press `Q` (also capital)
 
 ## What's already in
 
-* Procedural generation, both forwards and backwards
+* Procedural generation, all the way from the surface to the depths below
 * Chunk and region generation, with set sizes for both
 * Character movement
 * The ability to change the terrain
@@ -56,6 +56,7 @@ Finally, to quit the game, press `Q` (also capital)
 
 ## Immediate Problems/Bugs
 
+* Negative chunks don't generate right
 * Boilerplate
 * Structures generating incorrectly when crossing chunk borders
 * Crashing when reaching world height or world depth

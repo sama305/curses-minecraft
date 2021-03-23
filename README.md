@@ -33,6 +33,8 @@ To manually save the game (it's saved upon quitting), press `S` (capital)
 
 Finally, to quit the game, press `Q` (also capital)
 
+![Treehouse](/images/treehouse.png)
+
 # Project Layout
 
 ## What's already in
@@ -64,3 +66,6 @@ Finally, to quit the game, press `Q` (also capital)
 * Inconvenient block picking
 * Crashing when resizing window sometimes
 * Some layers are a bit boring
+
+# Have fun!
+![Ocean man](/images/ocean.png)

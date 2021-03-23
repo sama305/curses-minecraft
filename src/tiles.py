@@ -52,15 +52,15 @@ class Tiles:
         Tile('kelp', '⌠', 2, isSolid=False, isClimbable=True), # 41
         Tile('seaweed left', ')', 2, isSolid=False, isClimbable=True), # 42
         Tile('seaweed right', '(', 2, isSolid=False, isClimbable=True), # 43
-        Tile('boat left', '\\', 3, isSolid=False, isClimbable=True), # 44
-        Tile('boat right', '/', 3, isSolid=False, isClimbable=True), # 45
+        Tile('wood panel left', '\\', 3, isSolid=False, isClimbable=True), # 44
+        Tile('wood panel right', '/', 3, isSolid=False, isClimbable=True), # 45
         Tile('wood floor', '_', 3, isSolid=False, isClimbable=True), # 46
         Tile('flag', '>', 4, isSolid=False), # 47
         Tile('cod', '◄', 1, isSolid=False, isClimbable=True), # 48
         Tile('salmon', '»', 6, isSolid=False, isClimbable=True), # 49
         Tile('bass', '≤', 4, isSolid=False, isClimbable=True), # 50
         Tile('snowman head', '☻', 1, isSolid=False), # 51
-        Tile('snowman torso', 'O', 1, isSolid=False), # 
+        Tile('snowman torso', 'O', 1, isSolid=False), #
 
 
     ]

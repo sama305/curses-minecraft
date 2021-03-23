@@ -11,8 +11,8 @@ sys.path.insert(1, '../lib/perlin-noise-1.7/perlin_noise/')
 from perlin_noise import PerlinNoise
 
 start_height = 64
-snow_height = 50
-water_height = 64
+snow_height = 57
+water_height = 66
 
 # Structures:
 #

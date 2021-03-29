@@ -9,20 +9,28 @@ import random as r
 from tiles import Tiles as t
 from coord import Coord as p
 from chunk import Chunk
+from character import Character
 import os
 import json
 
 
-directions = {
-    "w": 0,
-    "e": 1,
-    "d": 2,
-    "c": 3,
-    "x": 4,
-    "z": 5,
-    "a": 6,
-    "q": 7,
-    "s": 8
+interact_directions = {
+    "w": (-1, 0),
+    "e": (-1, 1),
+    "d": (0, 1),
+    "c": (1, 1),
+    "x": (1, 0),
+    "z": (1, -1),
+    "a": (0, -1),
+    "q": (-1, -1),
+    "s": (0, 0)
+}
+
+move_directions = {
+    curses.KEY_LEFT: (0, -1),
+    curses.KEY_RIGHT: (0, 1),
+    curses.KEY_UP: (-1, 0),
+    curses.KEY_DOWN: (1, 0)
 }
 
 """
@@ -88,232 +96,10 @@ individual chunks.
 
 Along with this is input methods that allow the player to perform set actions.
 """
-class Character:
-    # Intializer
-    def __init__(self):
-        # Position of the player (y=50 is above the water)
-        self.pos = p(y=50)
-        # Current chunk the player is within
-        self.current_chunk = 0
-        # Chunk index of the chunk the player is within
-        self.current_chunk_index = 0
-        # Chunk index to the left of current_chunk
-        self.left_chunk_index = 0
-        # Chunk index to the right of the current_chunk
-        self.right_chunk_index = 0
-        # Current position along the curent chunk (y can be ignored)
-        self.current_chunk_pos = p(
-            x=math.floor(self.pos.x % 16), y=self.pos.y)
-        # List of all chunks (used instead of world.chunk_list)
-        self.chunk_list = []
-        # Tile ID of tile to place when using the placeTile method
-        self.equipped_tile = 0
-
-
-    """
-    Simply attempts to render the player character relative to the world origin
-    and a set offset (often the camera position)
-
-    Pre:
-    - Offset must have a pos attribute
-    - stdscr must not be null or undefined
-
-    Post:
-    - The player will either get rendered somewhere on the screen or simply
-    won't (this won't happen as the Camera is centered on the player)
-    """
-    def render(self, offset, stdscr):
-        try:
-            stdscr.addstr(self.pos.y + offset.y, self.pos.x + offset.x, '☺')
-        except:
-            pass
-
-
-    """
-    Get's chunk index relative to a chunk + offset
-
-    Pre:
-    - chunk_id must be an int
-    - offset must be an int
-
-    Post:
-    - Returns index of chunk who's position is chunk.pos + offset
-    """
-    def getAdjacentChunk(self, chunk_id, offset):
-        return self.getIndexOfChunk(chunk_id + offset)
-
-
-    """
-    Check for specific tile at a position within a chunk
-
-    Pre:
-    - tile_index must be a positive number that isn't greater than the length of
-      the tile_list in tiles.py
-    - chunk_index must be an int
-    - pos must be a Coord object
-
-    Post:
-    - Return True if the tile exists at the position, return False otherwise
-    """
-    def checkForTileInChunk(self, tile_index, chunk_index, pos):
-        if (self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))] == tile_index):
-            return True
-        return False
-
-
-    """
-    Get the isSolid attribute of a tile at a position within a chunk
-
-    Pre:
-    - chunk_index must be int
-    - pos must be a Coord object
-
-    Post:
-    - Return the isSolid attribute of the tile at the position
-    """
-    def collisionCheck(self, chunk_index, pos):
-        return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isSolid
-
-    def climbableCheck(self, chunk_index, pos):
-        return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isClimbable
-
-    def getIndexOfChunk(self, _id):
-        for i in range(len(w.chunk_list)):
-            if (self.chunk_list[i].chunk_pos == _id):
-                return i
-        return -1
-
-    def update(self, chunk_list):
-        self.current_chunk = math.floor(self.pos.x / 16)
-        self.current_chunk_pos = p(
-            x=math.floor(self.pos.x % 16), y=self.pos.y)
-        self.chunk_list = chunk_list
-
-        self.current_chunk_index = self.getIndexOfChunk(
-            self.current_chunk)
-        self.left_chunk_index = self.getAdjacentChunk(
-            self.current_chunk, -1)
-        self.right_chunk_index = self.getAdjacentChunk(
-            self.current_chunk, 1)
-
-    def movePlr(self, _dir):
-        # TODO
-        #
-
-        if (self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y + 1))
-         or self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))):
-            if (_dir == 0):
-                # On left edge of chunk
-                if (self.current_chunk_pos.x == 0):
-                    if (not self.collisionCheck(self.left_chunk_index, p(y=self.pos.y, x=15))):
-                        self.pos.addX(-1)
-                    elif (not self.collisionCheck(self.left_chunk_index, p(y=self.pos.y-1, x=15))):
-                        self.pos.addX(-1); self.pos.addY(-1)
-                # Anywhere in between
-                else:
-                    if (not self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x-1, y=self.pos.y))):
-                        self.pos.addX(-1)
-                    elif (not self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x-1, y=self.pos.y-1))):
-                        self.pos.addX(-1); self.pos.addY(-1)
-            elif (_dir == 1):
-                # On right edge of chunk
-                if (self.current_chunk_pos.x == 15):
-                    if (not self.collisionCheck(self.right_chunk_index, p(y=self.pos.y, x=0))):
-                        self.pos.addX(1)
-                    elif (not self.collisionCheck(self.right_chunk_index, p(y=self.pos.y-1, x=0))):
-                        self.pos.addX(1); self.pos.addY(-1)
-                # Anywhere in between
-                else:
-                    if (not self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x+1, y=self.pos.y))):
-                        self.pos.addX(1)
-                    elif (not self.collisionCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x+1, y=self.pos.y-1))):
-                        self.pos.addX(1); self.pos.addY(-1)
-            elif (_dir == 2):
-                if (self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))
-                and self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y - 1))):
-                    self.pos.addY(-1)
-            elif (_dir == 3):
-                if (self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y))
-                and self.climbableCheck(self.current_chunk_index, p(x=self.current_chunk_pos.x, y=self.pos.y + 1))):
-                    self.pos.addY(1)
-        # If tile below player is air, just make player fall
-        else:
-            self.pos.y += 1
-
-    def plrPlaceTile(self, _dir):
-        # N
-        if (_dir == 0):
-            g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                x=self.current_chunk_pos.x, y=self.current_chunk_pos.y - 1), self.equipped_tile)
-        # NE
-        elif (_dir == 1):
-            if (self.current_chunk_pos.x == 15):
-                g.placeTile(self.chunk_list[self.right_chunk_index].data, p(
-                    x=0, y=self.current_chunk_pos.y - 1), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x + 1, y=self.current_chunk_pos.y - 1), self.equipped_tile)
-        # E
-        elif (_dir == 2):
-            if (self.current_chunk_pos.x == 15):
-                g.placeTile(self.chunk_list[self.right_chunk_index].data, p(
-                    x=0, y=self.current_chunk_pos.y), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x + 1, y=self.current_chunk_pos.y), self.equipped_tile)
-        # SE
-        elif (_dir == 3):
-            if (self.current_chunk_pos.x == 15):
-                g.placeTile(self.chunk_list[self.right_chunk_index].data, p(
-                    x=0, y=self.current_chunk_pos.y + 1), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x + 1, y=self.current_chunk_pos.y + 1), self.equipped_tile)
-        # S
-        elif (_dir == 4):
-            if (t.tile_list[self.equipped_tile].isSolid):
-                self.pos.addY(-1)
-
-            g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                x=self.current_chunk_pos.x, y=self.pos.y + 1), self.equipped_tile)
-
-            if (not t.tile_list[self.equipped_tile].isSolid):
-                self.pos.addY(1)
-        # SW
-        elif (_dir == 5):
-            if (self.current_chunk_pos.x == 0):
-                g.placeTile(self.chunk_list[self.left_chunk_index].data, p(
-                    x=15, y=self.current_chunk_pos.y + 1), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x - 1, y=self.current_chunk_pos.y + 1), self.equipped_tile)
-        # W
-        elif (_dir == 6):
-            if (self.current_chunk_pos.x == 0):
-                g.placeTile(self.chunk_list[self.left_chunk_index].data, p(
-                    x=15, y=self.current_chunk_pos.y), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x - 1, y=self.current_chunk_pos.y), self.equipped_tile)
-        # NW
-        elif (_dir == 7):
-            if (self.current_chunk_pos.x == 0):
-                g.placeTile(self.chunk_list[self.left_chunk_index].data, p(
-                    x=15, y=self.current_chunk_pos.y - 1), self.equipped_tile)
-            else:
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x - 1, y=self.current_chunk_pos.y - 1), self.equipped_tile)
-
-        elif (_dir == 8):
-            if (not t.tile_list[self.equipped_tile].isSolid):
-                g.placeTile(self.chunk_list[self.current_chunk_index].data, p(
-                    x=self.current_chunk_pos.x, y=self.current_chunk_pos.y), self.equipped_tile)
 
 
 
-# +------------------------------------------------------+
-# |                      MAIN LOOP!                      |
-# +------------------------------------------------------+
+
 cam = Camera()
 
 plr = Character()
@@ -334,7 +120,7 @@ def initialize_menu():
 
 def curses_main(stdscr):
     stdscr.clear()
-    curses.halfdelay(5)
+    stdscr.timeout(1)
     curses.noecho()
     curses.curs_set(0)
     rows, cols = stdscr.getmaxyx()
@@ -449,7 +235,7 @@ def curses_main(stdscr):
             stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
             stdscr.addstr(1, 0, 'Y:' + str(plr.pos.y))
             stdscr.addstr(2, 0, 'CHUNK:' + str(plr.current_chunk) +
-                          " - " + str(plr.current_chunk_pos.x + 1) + "/16")
+                          " - " + str(plr.current_chunk_pos + 1) + "/16")
             stdscr.addstr(3, 0, 'SELECTED TILE: [' + str(plr.equipped_tile) + ']')
             stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
                                  curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
@@ -464,16 +250,8 @@ def curses_main(stdscr):
             sl.saveWorld(w, plr)
             stdscr.addstr(0, math.floor(cols / 2), "Saving...")
             stdscr.refresh()
-
-
-        if (k == curses.KEY_LEFT):
-            plr.movePlr(0)
-        if (k == curses.KEY_RIGHT):
-            plr.movePlr(1)
-        if (k == curses.KEY_UP):
-            plr.movePlr(2)
-        if (k == curses.KEY_DOWN):
-            plr.movePlr(3)
+        # Updates the screen
+        plr.movePlr((2, 2))
 
         if (k == ord('1')):
             plr.equipped_tile -= 1
@@ -490,11 +268,15 @@ def curses_main(stdscr):
             show_hud = not show_hud
             stdscr.refresh()
 
-        # Iterates over all possible directions to check for placing
+        # Iterates over all possible directions to check for placing and moving
         # NOTE: Heavily reduces boilerplate
-        for key in directions:
+        for key in interact_directions:
             if (k == ord(key)):
-                plr.plrPlaceTile(directions[key])
+                plr.plrPlaceTile(interact_directions[key])
+
+        for key in move_directions:
+            if (k == key):
+                plr.movePlr(move_directions[key])
 
         cam.pos.x = -plr.pos.x + int(cols / 2)
         cam.pos.y = -plr.pos.y + int(rows / 2)

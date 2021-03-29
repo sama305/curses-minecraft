@@ -255,7 +255,7 @@ def generateChunk(chunk_pos, seed):
             elif (y > 30 + height_map[x]):
                 placeTile(chunk, Coord(x, y), 4)
                 cave_val = noise3([(x + start_pos)/64 / 2, y/(256 - height_map[x]) * 4])
-                if (abs(cave_val) < 0.001 * (y % (256 - height_map[x]))):
+                if (abs(cave_val) < 0.07):
                     placeTile(chunk, Coord(x, y), 0)
             # Shale layer
             elif (y > 5 + height_map[x]):

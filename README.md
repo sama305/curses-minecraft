@@ -1,4 +1,4 @@
-# curses-minecraft v0.9
+# curses-minecraft v0.10
 
 ![Cover image](/images/cover_image.png)
 
@@ -12,12 +12,18 @@
 * removed tons of unneeded or accidentally added files
 * fixed `save_data` loading from root
 * removed worlds included with repo
+* removed horrible jitter
+* increased chunk render/gen distance
 
 I apparantly forgot to document any changes I made pre-`release/v0.10`. How I got to `v0.9` is beyond me, but from this point on I'll document any changes I make.
 
 </details>
 
-# Description
+# Note from 2025
+
+Hi, if you've found this repo, this is my 2021 High School Senior Project for the CS AP Test. In a lot of ways, it isn't too pretty. But it also has some great programming and I think it's quite a good showcase of perlin noise. I have kept it mostly in its original form, but updated a few bugs like `run.sh` not workijng and a horrible flicker. I also added some HUD elements to make the controls more clear. Besides that, however, this is the same as it was years ago. So I hope you enjoy this experimental, buggy, but really creative project I'm still proud of to this day.
+
+# Original description
 
 This was my Senior Project for the Computer Science AP Test in 2021. This program showcases perlin noise being used to generate a procedural world with working structure generation, chunk generation/rendering, and the ability to modify the world.
 

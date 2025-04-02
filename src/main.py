@@ -76,11 +76,6 @@ class World:
         for c in self.chunk_list:
             c.render(cam.pos, stdscr)
 
-# Create World
-# TODO: load data from save file
-w = World(0, 'new_world')
-
-
 """
 Simple class that holds the position for the Camera object
 """
@@ -97,6 +92,7 @@ individual chunks.
 Along with this is input methods that allow the player to perform set actions.
 """
 
+w = World(0, "new_world")
 
 
 
@@ -104,22 +100,17 @@ cam = Camera()
 
 plr = Character()
 
-chunk_gen_distance = 3
-chunk_render_distance = 2
-
-# Pregenerating chunk
-#for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
-
+chunk_gen_distance = 4
+chunk_render_distance = 4
 
 menu_options = ["Start new game"]
 def initialize_menu():
-	file_list = os.listdir("../save_data/")
+	file_list = os.listdir("./save_data/")
 	for f in file_list:
 		menu_options.append(f)
 
 
 def curses_main(stdscr):
-    stdscr.clear()
     stdscr.timeout(1)
     curses.noecho()
     curses.curs_set(0)
@@ -142,14 +133,15 @@ def curses_main(stdscr):
     author = "Samuel Anderson"
     game_title = "Curses-craft (working title)"
     selected = 0
+    crash = False
 
     initialize_menu()
 
     # +------------------------------------------------------+
     # |                      MENU LOOP!                      |
     # +------------------------------------------------------+
-    while (True):
-        stdscr.refresh()
+    while (not crash):
+        stdscr.clear()
         stdscr.addstr(1, math.floor(cols / 2) - math.floor(len(game_title) / 2), game_title)
         stdscr.addstr(rows - 2, math.floor(cols / 2) - math.floor(len("By " + author) / 2), "By " + author)
 
@@ -182,7 +174,7 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Loading...") / 2), "Loading...")
                 stdscr.refresh()
 
-                with open("../save_data/" + menu_options[selected]) as f:
+                with open("./save_data/" + menu_options[selected]) as f:
                     data = json.load(f)
 
                 w.name = data['name']
@@ -197,7 +189,7 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Creating world...") / 2), "Creating world...")
                 stdscr.refresh()
 
-                w.name = "world_" + str(len(os.listdir("../save_data/")) + 1)
+                w.name = "world_" + str(len(os.listdir("./save_data/")) + 1)
                 w.seed = r.randint(0, 999)
                 [w.newChunk(i) for i in range(-4, 4)]
             break
@@ -219,9 +211,6 @@ def curses_main(stdscr):
             if (plr.getIndexOfChunk(new_chunk - chunk_gen_distance - 1) == -1):
                 w.newChunk(new_chunk - chunk_gen_distance - 1)
 
-        stdscr.clear()
-        #w.render(cam, stdscr)
-
         # Chunk rendering
         for i in range(-abs(chunk_render_distance), abs(chunk_render_distance + 1)):
             w.chunk_list[plr.getAdjacentChunk(
@@ -229,7 +218,6 @@ def curses_main(stdscr):
 
         plr.render(cam.pos, stdscr)
 
-        stdscr.refresh()
 
         if (show_hud):
             stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
@@ -240,6 +228,9 @@ def curses_main(stdscr):
             stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
                                  curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
             stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
+            stdscr.addstr(4, 0, 'Press \'Q\' to quit')
+            stdscr.addstr(4, 0, 'Press \'S\' to save')
+            stdscr.addstr(4, 0, 'Press \'h\' to hide the HUD')
 
         k = stdscr.getch()
 
@@ -250,6 +241,7 @@ def curses_main(stdscr):
             sl.saveWorld(w, plr)
             stdscr.addstr(0, math.floor(cols / 2), "Saving...")
             stdscr.refresh()
+
         # Updates the screen
         plr.movePlr((2, 2))
 
@@ -280,7 +272,7 @@ def curses_main(stdscr):
 
         cam.pos.x = -plr.pos.x + int(cols / 2)
         cam.pos.y = -plr.pos.y + int(rows / 2)
-    stdscr.refresh()
+    stdscr.clear()
 
 
 curses.wrapper(curses_main)

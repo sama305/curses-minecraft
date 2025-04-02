@@ -113,7 +113,7 @@ chunk_render_distance = 2
 
 menu_options = ["Start new game"]
 def initialize_menu():
-	file_list = os.listdir("../save_data/")
+	file_list = os.listdir("./save_data/")
 	for f in file_list:
 		menu_options.append(f)
 
@@ -182,7 +182,7 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Loading...") / 2), "Loading...")
                 stdscr.refresh()
 
-                with open("../save_data/" + menu_options[selected]) as f:
+                with open("./save_data/" + menu_options[selected]) as f:
                     data = json.load(f)
 
                 w.name = data['name']
@@ -197,7 +197,7 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Creating world...") / 2), "Creating world...")
                 stdscr.refresh()
 
-                w.name = "world_" + str(len(os.listdir("../save_data/")) + 1)
+                w.name = "world_" + str(len(os.listdir("./save_data/")) + 1)
                 w.seed = r.randint(0, 999)
                 [w.newChunk(i) for i in range(-4, 4)]
             break

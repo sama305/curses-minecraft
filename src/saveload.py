@@ -2,7 +2,7 @@ import json
 import interpreter
 from chunk import Chunk
 
-save_root = '../save_data/'
+save_root = './save_data/'
 
 def saveChunk(c):
     c_data = interpreter.arrToData(c)

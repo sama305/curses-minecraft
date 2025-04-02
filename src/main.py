@@ -3,8 +3,6 @@
 import curses
 import math
 import saveload as sl
-import generation as g
-import util as u
 import random as r
 from tiles import Tiles as t
 from coord import Coord as p
@@ -229,8 +227,8 @@ def curses_main(stdscr):
                                  curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
             stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
             stdscr.addstr(4, 0, 'Press \'Q\' to quit')
-            stdscr.addstr(4, 0, 'Press \'S\' to save')
-            stdscr.addstr(4, 0, 'Press \'h\' to hide the HUD')
+            stdscr.addstr(5, 0, 'Press \'S\' to save')
+            stdscr.addstr(6, 0, 'Press \'h\' to hide the HUD')
 
         k = stdscr.getch()
 

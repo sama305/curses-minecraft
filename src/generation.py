@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import math
-from tiles import Tiles
 import random
 from coord import Coord
 import util as u

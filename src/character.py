@@ -1,7 +1,6 @@
 from tiles import Tiles as t
 from coord import Coord as p
 import generation as g
-from chunk import Chunk
 import math
 import util as u
 
@@ -90,6 +89,9 @@ class Character:
     def collisionCheck(self, chunk_index, pos):
         return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isSolid
 
+    def bedrockCheck(self, chunk_index, pos):
+        return self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))] == 8
+
     def climbableCheck(self, chunk_index, pos):
         return t.tile_list[self.chunk_list[chunk_index].data[u.coordToIndex(p(y=pos.y, x=pos.x))]].isClimbable
 
@@ -131,12 +133,14 @@ class Character:
                 if (not self.collisionCheck(chunk_to_check, p(x=pos_to_check, y=self.pos.y))):
                     self.pos.addX(_dir[1])
                 elif (not self.collisionCheck(chunk_to_check, p(x=pos_to_check, y=self.pos.y-1))):
-                    self.pos.addX(_dir[1]); self.pos.addY(-1)
+                    self.pos.addX(_dir[1])
+                    self.pos.addY(-1)
 
             elif (abs(_dir[0]) == 1):
                 if (self.climbableCheck(chunk_to_check, p(x=self.current_chunk_pos, y=self.pos.y))
                 and self.climbableCheck(chunk_to_check, p(x=self.current_chunk_pos, y=self.pos.y + _dir[0]))):
                     self.pos.addY(_dir[0])
+
         # If tile below player is air, just make player fall
         else:
             self.pos.y += 1
@@ -145,6 +149,10 @@ class Character:
     def plrPlaceTile(self, _dir):
         place_pos = p(x=self.current_chunk_pos + _dir[1], y=self.pos.y + _dir[0])
         chunk_to_check = self.current_chunk_index
+
+        # bedrock can't be placed on
+        if self.bedrockCheck(chunk_to_check, place_pos):
+            return
 
         if (_dir[1] == 1 and self.current_chunk_pos == 15):
             place_pos.x = 0

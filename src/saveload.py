@@ -1,6 +1,7 @@
 import json
 import interpreter
 from chunk import Chunk
+import os
 
 save_root = './save_data/'
 
@@ -29,7 +30,9 @@ def saveWorld(w, p):
         'player_equipped_tile': p.equipped_tile
     }
 
-    with open(file_name, 'w') as _file:
+    # make save_data dir if necessary
+    os.makedirs('./save_data')
+    with open(file_name, 'w+') as _file:
         _file.write(json.dumps(data, sort_keys=True, indent=4))
 
     _file.close()

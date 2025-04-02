@@ -103,9 +103,13 @@ chunk_render_distance = 4
 
 menu_options = ["Start new game"]
 def initialize_menu():
-	file_list = os.listdir("./save_data/")
-	for f in file_list:
-		menu_options.append(f)
+    try:
+    	file_list = os.listdir("./save_data/")
+    	for f in file_list:
+    		menu_options.append(f)
+    except FileNotFoundError:
+        pass
+    
 
 
 def curses_main(stdscr):
@@ -187,7 +191,12 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Creating world...") / 2), "Creating world...")
                 stdscr.refresh()
 
-                w.name = "world_" + str(len(os.listdir("./save_data/")) + 1)
+                try:
+                    next_world_id = len(os.listdir("./save_data/"))
+                except FileNotFoundError:
+                    next_world_id = 0
+
+                w.name = "world_" + str(next_world_id + 1)
                 w.seed = r.randint(0, 999)
                 [w.newChunk(i) for i in range(-4, 4)]
             break

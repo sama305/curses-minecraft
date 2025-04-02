@@ -76,11 +76,6 @@ class World:
         for c in self.chunk_list:
             c.render(cam.pos, stdscr)
 
-# Create World
-# TODO: load data from save file
-w = World(0, 'new_world')
-
-
 """
 Simple class that holds the position for the Camera object
 """
@@ -97,6 +92,7 @@ individual chunks.
 Along with this is input methods that allow the player to perform set actions.
 """
 
+w = World(0, "new_world")
 
 
 
@@ -105,11 +101,7 @@ cam = Camera()
 plr = Character()
 
 chunk_gen_distance = 3
-chunk_render_distance = 2
-
-# Pregenerating chunk
-#for i in range(-abs(chunk_gen_distance + 5), abs(chunk_gen_distance + 5)):
-
+chunk_render_distance = 4
 
 menu_options = ["Start new game"]
 def initialize_menu():
@@ -142,13 +134,14 @@ def curses_main(stdscr):
     author = "Samuel Anderson"
     game_title = "Curses-craft (working title)"
     selected = 0
+    crash = False
 
     initialize_menu()
 
     # +------------------------------------------------------+
     # |                      MENU LOOP!                      |
     # +------------------------------------------------------+
-    while (True):
+    while (not crash):
         stdscr.refresh()
         stdscr.addstr(1, math.floor(cols / 2) - math.floor(len(game_title) / 2), game_title)
         stdscr.addstr(rows - 2, math.floor(cols / 2) - math.floor(len("By " + author) / 2), "By " + author)
@@ -219,9 +212,6 @@ def curses_main(stdscr):
             if (plr.getIndexOfChunk(new_chunk - chunk_gen_distance - 1) == -1):
                 w.newChunk(new_chunk - chunk_gen_distance - 1)
 
-        stdscr.clear()
-        #w.render(cam, stdscr)
-
         # Chunk rendering
         for i in range(-abs(chunk_render_distance), abs(chunk_render_distance + 1)):
             w.chunk_list[plr.getAdjacentChunk(
@@ -229,7 +219,6 @@ def curses_main(stdscr):
 
         plr.render(cam.pos, stdscr)
 
-        stdscr.refresh()
 
         if (show_hud):
             stdscr.addstr(0, 0, 'X:' + str(plr.pos.x))
@@ -240,6 +229,9 @@ def curses_main(stdscr):
             stdscr.addstr(3, 18 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].texture,
                                  curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
             stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
+            stdscr.addstr(4, 0, 'Press \'Q\' to quit')
+            stdscr.addstr(4, 0, 'Press \'S\' to save')
+            stdscr.addstr(4, 0, 'Press \'h\' to hide the HUD')
 
         k = stdscr.getch()
 

@@ -100,7 +100,7 @@ cam = Camera()
 
 plr = Character()
 
-chunk_gen_distance = 3
+chunk_gen_distance = 4
 chunk_render_distance = 4
 
 menu_options = ["Start new game"]
@@ -111,7 +111,6 @@ def initialize_menu():
 
 
 def curses_main(stdscr):
-    stdscr.clear()
     stdscr.timeout(1)
     curses.noecho()
     curses.curs_set(0)
@@ -142,7 +141,7 @@ def curses_main(stdscr):
     # |                      MENU LOOP!                      |
     # +------------------------------------------------------+
     while (not crash):
-        stdscr.refresh()
+        stdscr.clear()
         stdscr.addstr(1, math.floor(cols / 2) - math.floor(len(game_title) / 2), game_title)
         stdscr.addstr(rows - 2, math.floor(cols / 2) - math.floor(len("By " + author) / 2), "By " + author)
 
@@ -242,6 +241,7 @@ def curses_main(stdscr):
             sl.saveWorld(w, plr)
             stdscr.addstr(0, math.floor(cols / 2), "Saving...")
             stdscr.refresh()
+
         # Updates the screen
         plr.movePlr((2, 2))
 
@@ -272,7 +272,7 @@ def curses_main(stdscr):
 
         cam.pos.x = -plr.pos.x + int(cols / 2)
         cam.pos.y = -plr.pos.y + int(rows / 2)
-    stdscr.refresh()
+    stdscr.clear()
 
 
 curses.wrapper(curses_main)

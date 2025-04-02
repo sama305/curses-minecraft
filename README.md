@@ -12,6 +12,8 @@
 * removed tons of unneeded or accidentally added files
 * fixed `save_data` loading from root
 * removed worlds included with repo
+* removed horrible jitter
+* increased chunk render/gen distance
 
 I apparantly forgot to document any changes I made pre-`release/v0.10`. How I got to `v0.9` is beyond me, but from this point on I'll document any changes I make.
 

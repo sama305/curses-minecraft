@@ -3,8 +3,6 @@
 import curses
 import math
 import saveload as sl
-import generation as g
-import util as u
 import random as r
 from tiles import Tiles as t
 from coord import Coord as p
@@ -105,9 +103,13 @@ chunk_render_distance = 4
 
 menu_options = ["Start new game"]
 def initialize_menu():
-	file_list = os.listdir("./save_data/")
-	for f in file_list:
-		menu_options.append(f)
+    try:
+    	file_list = os.listdir("./save_data/")
+    	for f in file_list:
+    		menu_options.append(f)
+    except FileNotFoundError:
+        pass
+    
 
 
 def curses_main(stdscr):
@@ -189,7 +191,12 @@ def curses_main(stdscr):
                 stdscr.addstr(math.floor(rows / 2) + i - math.floor(len(menu_options) / 2 - 2), math.floor(cols / 2) - math.floor(len("Creating world...") / 2), "Creating world...")
                 stdscr.refresh()
 
-                w.name = "world_" + str(len(os.listdir("./save_data/")) + 1)
+                try:
+                    next_world_id = len(os.listdir("./save_data/"))
+                except FileNotFoundError:
+                    next_world_id = 0
+
+                w.name = "world_" + str(next_world_id + 1)
                 w.seed = r.randint(0, 999)
                 [w.newChunk(i) for i in range(-4, 4)]
             break
@@ -229,8 +236,8 @@ def curses_main(stdscr):
                                  curses.color_pair(t.tile_list[plr.equipped_tile].color_pair))
             stdscr.addstr(3, 20 + len(str(plr.equipped_tile)), t.tile_list[plr.equipped_tile].name)
             stdscr.addstr(4, 0, 'Press \'Q\' to quit')
-            stdscr.addstr(4, 0, 'Press \'S\' to save')
-            stdscr.addstr(4, 0, 'Press \'h\' to hide the HUD')
+            stdscr.addstr(5, 0, 'Press \'S\' to save')
+            stdscr.addstr(6, 0, 'Press \'h\' to hide the HUD')
 
         k = stdscr.getch()
 

@@ -1,10 +1,15 @@
-# curses-minecraft v0.10
+# curses-minecraft v0.11
 
 ![Cover image](/images/cover_image.png)
 
 <details>
 <summary>Changelog</summary>
 <br />
+
+`release/v0.11`
+* HUD properly displays button to quit and save
+* bedrock can no longer be mined
+* removed many unused files/imports
 
 `release/v0.10`
 * added `requirements.txt`
